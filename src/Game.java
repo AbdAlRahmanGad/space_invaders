@@ -2,9 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Game implements ActionListener {
     JFrame frame;
@@ -26,7 +24,7 @@ public class Game implements ActionListener {
     int direction = 1;
     int bulletNumber = 0;
     int start = 0;
-    ArrayList<JLabel> enemies = new ArrayList<JLabel>();
+    ArrayList<JLabel> enemies = new ArrayList<>();
     Timer moveAlien;
 //    int enemiesSize;
 
@@ -91,6 +89,9 @@ public class Game implements ActionListener {
 
         /// Frame stuff
         frame = new JFrame("Snake Demo");
+        frame.setBackground(Color.gray);
+        frame.getContentPane().setBackground( Color.BLACK );
+
         frame.add(scoreLabel);
         frame.add(ship);
         frame.add(bullet);
@@ -131,7 +132,7 @@ public class Game implements ActionListener {
                     if(b.getY()>= enemy.getY()&& b.getY()<= enemy.getY()+20){
                         if(b.getX()+20>= enemy.getX()-10&& b.getX()+20<= enemy.getX()+30){
                                 frame.remove(enemy);
-                            enemies.remove(i);
+                                enemies.remove(i);
                         }
                     }
                 }

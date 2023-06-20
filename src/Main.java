@@ -1,12 +1,18 @@
 public class Main {
     public static void main(String[] args) {
         new Game();
-        new Game();
-//fdffdsa
-//        fasdfsda
 //        👾
 //        👾
         /**
+         *
+         * make it more costimaizable ->>>>> aframe before playing
+         * spacfying backgroind color and mode
+         *specyfy spaceship ?
+         *
+         * another mode -> auto bullet or intended bullet
+         *
+         * another mode specify the aliens icon
+         *
          * score ->
          *
          * enemies -> bullets

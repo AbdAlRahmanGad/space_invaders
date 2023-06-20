@@ -13,13 +13,13 @@ public class Main {
          *
          * another mode specify the aliens icon
          *
-         * score ->
+         * score ->  Donea
          *
-         * enemies -> bullets
+         * enemies -> bullets  Done
          *
          * if (  enemy bullet hit ship  )    ship - > die
          *
-         * if (  ship bullet  {hit} enemy bullet ) both disappear
+         * if (  ship bullet  {hit} enemy bullet ) both disappear      DONE
          *
          *
          * maybe one bullet is a super one

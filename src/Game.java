@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ public class Game implements ActionListener {
     JLabel ship;
     JLabel enemy;
     JLabel scoreLabel;
+    JLabel livesLabel;
 
     Action upAction;
     Action downAction;
@@ -22,6 +24,7 @@ public class Game implements ActionListener {
 
     int bulletNumber1 =0;
     int score =0;
+    int lives =3;
     int movement= 10;
     int WIDTH = 500;
     int HEIGHT = 500;
@@ -30,6 +33,7 @@ public class Game implements ActionListener {
     int start = 0;
     ArrayList<JLabel> enemies = new ArrayList<>();
     Timer moveAlien;
+    Timer moveBullet;
 //    int enemiesSize;
 
     Game(){
@@ -37,6 +41,10 @@ public class Game implements ActionListener {
         scoreLabel = new JLabel("Score : "+score);
         scoreLabel.setForeground(Color.white);
         scoreLabel.setBounds(0,200,100,30);
+        /// score Label
+        livesLabel = new JLabel("lives left : "+lives);
+        livesLabel.setForeground(Color.white);
+        livesLabel.setBounds(0,400,100,30);
         /// spaceship icon
         ImageIcon spaceShip = new ImageIcon("src/spaceship.png");
         Image img = spaceShip.getImage();
@@ -103,7 +111,7 @@ public class Game implements ActionListener {
         frame = new JFrame("Snake Demo");
         frame.setBackground(Color.gray);
         frame.getContentPane().setBackground( Color.BLACK );
-
+        frame.add(livesLabel);
         frame.add(scoreLabel);
         frame.add(ship);
         frame.add(bullet);
@@ -139,7 +147,7 @@ public class Game implements ActionListener {
             }
         });
         setEnemyBullet.start();
-        Timer  moveEnemyBullet = new Timer(50,new AbstractAction("bullet move") {
+        Timer  moveEnemyBullet = new Timer(50,new AbstractAction("enemy bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 JLabel b = enemyBullets.get(enemyBulletNumber1);
@@ -150,21 +158,31 @@ public class Game implements ActionListener {
 //                }
                 for (int i = 0; i <bullets.size() ; i++) {
                     JLabel shipBullet = bullets.get(i);
-//                    if(b.getY()>= enemy.getY()&& b.getY()<= enemy.getY()+20){
-//                        if(b.getX()+20>= enemy.getX()-10&& b.getX()+20<= enemy.getX()+30){
                     if(shipBullet.getY()>= b.getY()&& shipBullet.getY()<= b.getY()+20){
                         if(shipBullet.getX()+10>= b.getX()&& shipBullet.getX()+20<= b.getX()+30){
-//                            frame.remove(shipBu/llet);
+//                            frame.remove(shipBullet);
                             shipBullet.setLocation(-50, -50);
-
-//                            bullets.remove(i);
-                            ////   not  super bullet
                             b.setLocation(-50, -50);
                                 break;
                         }
                     }
                 }
+                if(b.getY()>= ship.getY()-20&& b.getY()<= ship.getY()){
+                    if(b.getX()>= ship.getX()-27&& b.getX()<= ship.getX()+5){
+//                            frame.remove(shipBullet);
+//                        ship.setLocation(ship.getX()+10, ship.getY()+10);
+                        b.setLocation(-50,-50);
+                        lives--;
+                        livesLabel.setText("lives left : "+lives);
+                        if(lives == 0 ){
+                            endGame();
+                        }
 
+//                        b.setLocation(-50, -50);
+//                        break;
+                    }
+                }
+//                if(b.getY() )
 //                JLabel b  =  bullets.get(bulletNumber1);
                 if(b.getY()<=530) {
                     b.setLocation(b.getX(), b.getY() + 10);
@@ -183,7 +201,7 @@ public class Game implements ActionListener {
             }
         });
         setBullet.start();
-        Timer moveBullet = new Timer(50,new AbstractAction("bullet move") {
+         moveBullet = new Timer(50,new AbstractAction("bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 JLabel b = bullets.get(bulletNumber1);
@@ -216,8 +234,20 @@ public class Game implements ActionListener {
     }
     public void setScore(){
         int enemiesLeft = enemies.size();
-        int newScore =   50-enemiesLeft;
-        scoreLabel.setText("Score : "+20*newScore );
+        int newScore =  20 * (50-enemiesLeft);
+        scoreLabel.setText("Score : "+newScore );
+        score = newScore;
+        if(score == 1000){
+            moveBullet.stop();
+            endGame();
+
+        }
+    }
+    public void endGame(){
+        frame.setVisible(false);
+        new Frame(score);
+//        score++;
+        frame.dispose();
     }
     @Override
     public void actionPerformed(ActionEvent e) {

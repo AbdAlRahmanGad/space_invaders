@@ -1,8 +1,16 @@
 public class Main {
     public static void main(String[] args) {
-        new Game();
+//        new Game();
+        new Frame(50);
 //        👾
 //        👾
+//                 * if (  enemy bullet hit ship  )    ship - > die
+
+
+        ///// make the alliens bullet GREEN
+        ///// make the alliens bullet GREEN
+        ///// make the alliens bullet GREEN
+
         /**
          *
          * make it more costimaizable ->>>>> aframe before playing
@@ -17,7 +25,7 @@ public class Main {
          *
          * enemies -> bullets  Done
          *
-         * if (  enemy bullet hit ship  )    ship - > die
+         * if (  enemy bullet hit ship  )    ship - > die               Done
          *
          * if (  ship bullet  {hit} enemy bullet ) both disappear      DONE
          *

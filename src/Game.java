@@ -4,41 +4,38 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class Game implements ActionListener {
-    JFrame frame;
-    int WIDTH = 500;
-    int HEIGHT = 500;
+public class Game implements Runnable {
+    private JFrame frame;
+    private int WIDTH = 500;
+    private int HEIGHT = 500;
 
-    JLabel scoreLabel;
-    JLabel livesLabel;
-    int score =0;
-    int lives =3;
-    int start = 0;
-
-
-
+    private JLabel scoreLabel;
+    private JLabel livesLabel;
+    private int score =0;
+    private int lives =3;
+    private int start = 0;
+    private final int FPS = 60;
 
 
+    private int enemyBulletNumber=0;
+    private int enemyBulletNumber1=0;
+    private int bulletNumber = 0;
+    private int bulletNumber1 =0;
 
 
-
-    int enemyBulletNumber=0;
-    int enemyBulletNumber1=0;
-    int bulletNumber = 0;
-    int bulletNumber1 =0;
-
-
-    int direction = 1;
-    Timer moveAlien;
-    Timer moveBullet;
-    Timer setBullet;
-    Timer moveEnemyBullet;
-    Timer setEnemyBullet;
-
-    ArrayList<Alien> aliens = new ArrayList<>();
-    SpaceShip ship = new SpaceShip(HEIGHT,WIDTH);
+    private int direction = 1;
+    private Timer moveAlien;
+    private Timer moveBullet;
+    private Timer setBullet;
+    private Timer moveEnemyBullet;
+    private Timer setEnemyBullet;
+    private Thread gameThread;
+    private ArrayList<Alien> aliens = new ArrayList<>();
+    private SpaceShip ship = new SpaceShip(HEIGHT,WIDTH);
 
     Game(int myBulletSpeed , int enemyBulletSpeed, int screenMode,int bulletMode){
+      gameThread = new Thread(this);
+      gameThread.start();
         /// place aliens
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 5; j++) {
@@ -70,7 +67,19 @@ public class Game implements ActionListener {
         livesLabel.setBounds(0,350,100,30);
 
         /// moving aliens timer
-        moveAlien = new Timer(50,this);
+        moveAlien = new Timer(50, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if(aliens.get(aliens.size()-1).getAlienLabel().getX()+30 >= 500 || aliens.get(0).getAlienLabel().getX() <= 0){
+                    direction *=-1;
+                }
+                for (int i = 0; i < aliens.size(); i++) {
+                    JLabel enemy = aliens.get(i).getAlienLabel();
+                    enemy.setLocation(enemy.getX()-direction,enemy.getY());
+                }
+            }
+        });
         moveAlien.start();
 
         ImageIcon bullet1 = new ImageIcon("src/bulletFinal.png");
@@ -213,7 +222,7 @@ public class Game implements ActionListener {
         frame.add(livesLabel);
         frame.add(scoreLabel);
     }
-    public void setScore(){
+    private void setScore(){
         int enemiesLeft = aliens.size();
         int newScore =  20 * (50-enemiesLeft);
         scoreLabel.setText("Score : "+newScore );
@@ -222,26 +231,50 @@ public class Game implements ActionListener {
             endGame();
         }
     }
-    public void endGame(){
+    private void endGame(){
           frame.setVisible(false);
           moveBullet.stop();
           setBullet.stop();
           moveAlien.stop();
           moveEnemyBullet.stop();
           setEnemyBullet.stop();
+          gameThread = null;
           new Frame(score);
           frame.dispose();
     }
+
+
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void run() {
 
-        if(aliens.get(aliens.size()-1).getAlienLabel().getX()+30 >= 500 || aliens.get(0).getAlienLabel().getX() <= 0){
-            direction *=-1;
+        double drawiInterval = 1000000000 / FPS;
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+        while (gameThread != null) {
+
+            currentTime = System.nanoTime();
+
+            delta += (currentTime - lastTime) / drawiInterval;
+
+            lastTime = currentTime;
+            if (delta >= 1) {
+                    update();
+                    delta--;
+            }
         }
-        for (int i = 0; i < aliens.size(); i++) {
-            JLabel enemy = aliens.get(i).getAlienLabel();
-            enemy.setLocation(enemy.getX()-direction,enemy.getY());
+    }private void update(){
+
+        if(ship.isRight()&&ship.getShip().getX()+ship.getShip().getWidth()<WIDTH){
+            ship.getShip().setLocation(ship.getShip().getX()+ship.getMovement(),ship.getShip().getY());
+        } else if (ship.isLeft()&&ship.getShip().getX()>0) {
+            ship.getShip().setLocation(ship.getShip().getX()-ship.getMovement(),ship.getShip().getY());
         }
+        if (ship.isUp() && ship.getShip().getY() > HEIGHT-120) {
+            ship.getShip().setLocation(ship.getShip().getX(),ship.getShip().getY()-ship.getMovement());
+        } else if (ship.isDown()&&ship.getShip().getY()+60<HEIGHT) {
+            ship.getShip().setLocation(ship.getShip().getX(),ship.getShip().getY()+ship.getMovement());
+        }
+
     }
-
 }

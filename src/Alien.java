@@ -4,6 +4,7 @@ import java.awt.*;
 public class Alien {
     private static int moveAlienBulletSpeed;
     private static int moveAlienBulletTimer;
+    private JLabel alienLabel;
 
     public JLabel getAlienLabel() {
         return alienLabel;
@@ -13,7 +14,6 @@ public class Alien {
         this.alienLabel = alienLabel;
     }
 
-    JLabel alienLabel;
 
 
    Alien(){

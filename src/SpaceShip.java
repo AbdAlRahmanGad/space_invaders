@@ -1,19 +1,51 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 public class SpaceShip {
 
-    JLabel ship;
-    Action upAction;
-    Action downAction;
-    Action leftAction;
-    Action rightAction;
-    int movement= 15;
-    int panelHeight;
-    int panelWidth;
-    int moveShipBulletSpeed ;
-    int moveShipBulletTimer ;
+   private JLabel ship;
+    private Action upAction;
+    private Action downAction;
+    private Action leftAction;
+    private Action rightAction;
+
+    private Action upActionR;
+    private Action downActionR;
+    private Action leftActionR;
+    private Action rightActionR;
+
+
+
+    private int movement = 3;
+    private int panelHeight;
+    private int panelWidth;
+    private int moveShipBulletSpeed ;
+    private int moveShipBulletTimer ;
+
+    private boolean isRight;
+    private boolean isLeft;
+    private boolean isUp;
+    private boolean isDown;
+    public int getMovement() {
+        return movement;
+    }
+    public boolean isRight() {
+        return isRight;
+    }
+
+    public boolean isLeft() {
+        return isLeft;
+    }
+
+    public boolean isUp() {
+        return isUp;
+    }
+
+    public boolean isDown() {
+        return isDown;
+    }
 
     public JLabel getShip() {
         return ship;
@@ -54,6 +86,11 @@ public class SpaceShip {
         downAction = new DownAction();
         leftAction = new LeftAction();
         rightAction = new RightAction();
+
+        upActionR = new UpActionR();
+        downActionR = new DownActionR();
+        leftActionR = new LeftActionR();
+        rightActionR = new RightActionR();
         ship.getInputMap().put(KeyStroke.getKeyStroke('w'), "upAction");
         ship.getInputMap().put(KeyStroke.getKeyStroke('s'), "downAction");
         ship.getInputMap().put(KeyStroke.getKeyStroke('a'), "leftAction");
@@ -62,6 +99,15 @@ public class SpaceShip {
         ship.getActionMap().put("leftAction", leftAction);
         ship.getActionMap().put("rightAction", rightAction);
         ship.getActionMap().put("downAction", downAction);
+
+        ship.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0, true), "upActionR");
+        ship.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "downActionR");
+        ship.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, true), "leftActionR");
+        ship.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "rightActionR");
+        ship.getActionMap().put("upActionR", upActionR);
+        ship.getActionMap().put("leftActionR", leftActionR);
+        ship.getActionMap().put("rightActionR", rightActionR);
+        ship.getActionMap().put("downActionR", downActionR);
     }
 
     private void initializeShipLabel() {
@@ -77,29 +123,52 @@ public class SpaceShip {
     public class UpAction extends AbstractAction   {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(ship.getY() > panelHeight-100)
-                ship.setLocation(ship.getX(), ship.getY()-movement);
+           isUp = true;
+        }
+    }
+    public class UpActionR extends AbstractAction   {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            isUp = false;
         }
     }
     public class DownAction extends AbstractAction{
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(ship.getY() <panelHeight-70 )
-                ship.setLocation(ship.getX(), ship.getY() + movement);
+            isDown = true;
+        }
+    }
+    public class DownActionR extends AbstractAction{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            isDown = false;
         }
     }
     public class LeftAction extends AbstractAction{
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(ship.getX() > 10 )
-                ship.setLocation(ship.getX() - movement, ship.getY());
+           isLeft = true;
+        }
+    }
+    public class LeftActionR extends AbstractAction{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            isLeft = false;
         }
     }
     public class RightAction extends AbstractAction{
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(ship.getX() < panelWidth-40 )
-                ship.setLocation(ship.getX()+movement, ship.getY());
+            isRight=true;
         }
     }
+
+    public class RightActionR extends AbstractAction{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            isRight=false;
+        }
+    }
+
+
 }

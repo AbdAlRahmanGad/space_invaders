@@ -1,13 +1,16 @@
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Game implements Runnable {
     private JFrame frame;
-    private int WIDTH = 500;
-    private int HEIGHT = 500;
+    private final int WIDTH = 500;
+    private final int HEIGHT = 500;
 
     private JLabel scoreLabel;
     private JLabel livesLabel;
@@ -18,8 +21,7 @@ public class Game implements Runnable {
 
 
 
-    private int bulletNumber = 0;
-    private int bulletNumber1 =0;
+    private final int bulletNumber = 0;
 
 
     private int direction = 1;
@@ -27,11 +29,16 @@ public class Game implements Runnable {
     private Thread gameThread;
     private ArrayList<Alien> aliens = new ArrayList<>();
     private SpaceShip ship = new SpaceShip(HEIGHT,WIDTH);
-
     private  ArrayList<Bullet> spaceBullets = new ArrayList<>();
+    private Audios audios ;
+    Game(int myBulletSpeed , int enemyBulletSpeed, int screenMode,int bulletMode) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+        audios = new Audios();
+        if(bulletMode == 2)
+        ship.setSuperBullet(true);
+      else
+        ship.setSuperBullet(false);
 
-    Game(int myBulletSpeed , int enemyBulletSpeed, int screenMode,int bulletMode){
-      gameThread = new Thread(this);
+        gameThread = new Thread(this);
       gameThread.start();
         /// place aliens
         for (int i = 0; i < 10; i++) {
@@ -64,26 +71,11 @@ public class Game implements Runnable {
         livesLabel.setBounds(0,350,100,30);
 
         /// moving aliens timer
-        moveAlien = new Timer(50, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if(aliens.get(aliens.size()-1).getAlienLabel().getX()+30 >= 500 || aliens.get(0).getAlienLabel().getX() <= 0){
-                    direction *=-1;
-                }
-                for (int i = 0; i < aliens.size(); i++) {
-                    JLabel enemy = aliens.get(i).getAlienLabel();
-                    enemy.setLocation(enemy.getX()-direction,enemy.getY());
-                }
-            }
-        });
-        moveAlien.start();
-
-
-        for (int i = 0; i < 3; i++) {
+        moveAlienTimer();
+//        for (int i = 0; i < 1; i++) {
             Bullet bulletShip = new Bullet();
             spaceBullets.add(bulletShip);
-        }
+//        }
         ship.setBullets(spaceBullets);
 
 
@@ -108,7 +100,6 @@ public class Game implements Runnable {
         frame.setBackground(Color.gray);
 
         frame.add(ship.getShip());
-//        frame.add(bullet);
         for (int i = 0; i < aliens.size(); i++) {
             frame.add(aliens.get(i).getAlienLabel());
         }
@@ -121,22 +112,35 @@ public class Game implements Runnable {
         frame.setLocationRelativeTo(null);
         setAlienBullet();
         startMoveAlienBullet();
+        setShipBullet();
+       startMoveShipBullet();
 
-         setBullet = new Timer(ship.getMoveShipBulletTimer(),new AbstractAction("bullet begin") {
+        frame.add(livesLabel);
+        frame.add(scoreLabel);
+    }
+
+    private void moveAlienTimer() {
+        moveAlien = new Timer(50, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if(aliens.get(aliens.size()-1).getAlienLabel().getX()+30 >= 500 || aliens.get(0).getAlienLabel().getX() <= 0){
+                    direction *=-1;
+                }
+                for (int i = 0; i < aliens.size(); i++) {
+                    JLabel enemy = aliens.get(i).getAlienLabel();
+                    enemy.setLocation(enemy.getX()-direction,enemy.getY());
+                }
+            }
+        });
+        moveAlien.start();
+    }
+
+    private void startMoveShipBullet() {
+        moveBullet = new Timer(ship.getMoveShipBulletSpeed(),new AbstractAction("bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 JLabel b = ship.getBullets().get(bulletNumber).getBulletLabel();
-                b.setBounds(ship.getShip().getX()-10,ship.getShip().getY()-15,50,50);
-                bulletNumber1 = bulletNumber;
-                frame.add(b);
-                bulletNumber = (bulletNumber+1)%3;
-            }
-        });
-        setBullet.start();
-         moveBullet = new Timer(ship.getMoveShipBulletSpeed(),new AbstractAction("bullet move") {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                JLabel b = ship.getBullets().get(bulletNumber1).getBulletLabel();
                 start++;
                 if(start <= 50){
                     return;
@@ -145,10 +149,10 @@ public class Game implements Runnable {
                     JLabel enemy = aliens.get(i).getAlienLabel();
                     if(b.getY()>= enemy.getY()&& b.getY()<= enemy.getY()+20){
                         if(b.getX()+20>= enemy.getX()-10&& b.getX()+20<= enemy.getX()+30){
-                                frame.remove(enemy);
-                                aliens.remove(i);
-                                //  super bullet
-                            if(bulletMode == 1){
+                            frame.remove(enemy);
+                            aliens.remove(i);
+                            //  super bullet
+                            if(!ship.isSuperBullet()){
                                 b.setLocation(-50, -50);
                                 break;
                             }
@@ -165,27 +169,33 @@ public class Game implements Runnable {
             }
         });
         moveBullet.start();
-        frame.add(livesLabel);
-        frame.add(scoreLabel);
+    }
+
+    private void setShipBullet() {
+        setBullet = new Timer(ship.getMoveShipBulletTimer(),new AbstractAction("bullet begin") {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+
+                JLabel b = ship.getBullets().get(bulletNumber).getBulletLabel();
+                b.setBounds(ship.getShip().getX()-10,ship.getShip().getY()-15,50,50);
+                frame.add(b);
+            }
+        });
+        setBullet.start();
     }
 
     private void startMoveAlienBullet() {
         moveAlienBullet = new Timer(Alien.getMoveAlienBulletSpeed(),new AbstractAction("enemy bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-//                ii(aliens.size())
                 ArrayList<JLabel> bb= new ArrayList<>();
-//                bb = null;
                 bb.add(bulletNow1);
-
                 if(aliens.size()>=3){
                     bb.add(bulletNow2);
                     bb.add(bulletNow3);
                 } else if (aliens.size() == 2) {
                     bb.add(bulletNow2);
                 }
-                System.out.println(bb.size());
-
                 for (int j = 0; j < bb.size(); j++) {
                     JLabel b = bb.get(j);
                     for (int i = 0; i <ship.getBullets().size(); i++) {
@@ -303,6 +313,7 @@ public class Game implements Runnable {
     }
     private void endGame(){
           frame.setVisible(false);
+          audios.playEnd();
           moveBullet.stop();
           setBullet.stop();
           moveAlien.stop();

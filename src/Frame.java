@@ -1,7 +1,10 @@
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class Frame extends JFrame implements ActionListener {
     JButton myButton = new JButton("Play Again");
@@ -91,7 +94,11 @@ public class Frame extends JFrame implements ActionListener {
         int enemyBulletSpeed = enemyBulletFast.isSelected()?1:2;
         int gameMode = darkMode.isSelected()?1:2;
         int bulletMode = shipBulletNotSuper.isSelected()?1:2;
-        new Game(shipBulletSpeed,enemyBulletSpeed,gameMode,bulletMode );
+        try {
+            new Game(shipBulletSpeed,enemyBulletSpeed,gameMode,bulletMode );
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
 }

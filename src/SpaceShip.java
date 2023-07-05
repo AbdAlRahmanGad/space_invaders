@@ -19,7 +19,10 @@ public class SpaceShip {
 
 
 
-    private int movement = 3;
+    private boolean superBullet;
+
+
+    private final int movement = 3;
     private int panelHeight;
     private int panelWidth;
     private int moveShipBulletSpeed ;
@@ -37,6 +40,13 @@ public class SpaceShip {
 
     public void setBullets(ArrayList<Bullet> bullets) {
         this.bullets = bullets;
+    }
+    public boolean isSuperBullet() {
+        return superBullet;
+    }
+
+    public void setSuperBullet(boolean superBullet) {
+        this.superBullet = superBullet;
     }
 
     public int getMovement() {

@@ -1,11 +1,22 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Alien {
     private static int moveAlienBulletSpeed;
     private static int moveAlienBulletTimer;
     private JLabel alienLabel;
 
+
+    public Bullet getBullet() {
+        return bullet;
+    }
+
+    public void setBullet(Bullet bullet) {
+        this.bullet = bullet;
+    }
+
+    private Bullet bullet = new Bullet();
     public JLabel getAlienLabel() {
         return alienLabel;
     }

@@ -17,21 +17,18 @@ public class Game implements Runnable {
     private final int FPS = 60;
 
 
-    private int enemyBulletNumber=0;
-    private int enemyBulletNumber1=0;
+
     private int bulletNumber = 0;
     private int bulletNumber1 =0;
 
 
     private int direction = 1;
-    private Timer moveAlien;
-    private Timer moveBullet;
-    private Timer setBullet;
-    private Timer moveEnemyBullet;
-    private Timer setEnemyBullet;
+
     private Thread gameThread;
     private ArrayList<Alien> aliens = new ArrayList<>();
     private SpaceShip ship = new SpaceShip(HEIGHT,WIDTH);
+
+    private  ArrayList<Bullet> spaceBullets = new ArrayList<>();
 
     Game(int myBulletSpeed , int enemyBulletSpeed, int screenMode,int bulletMode){
       gameThread = new Thread(this);
@@ -82,22 +79,19 @@ public class Game implements Runnable {
         });
         moveAlien.start();
 
-        ImageIcon bullet1 = new ImageIcon("src/bulletFinal.png");
-        Image bullet2 = bullet1.getImage();
-        Image bullet3 = bullet2.getScaledInstance(10, 10,  java.awt.Image.SCALE_SMOOTH);
-        bullet1.setImage(bullet3);
-        ArrayList<JLabel> bullets = new ArrayList<>();
-        JLabel bullet = new JLabel(bullet1);
-        JLabel bullet30 = new JLabel(bullet1);
-        JLabel bullet50 = new JLabel(bullet1);
-        bullets.add(bullet);
-        bullets.add(bullet30);
-        bullets.add(bullet50);
-        ArrayList<JLabel> enemyBullets = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            JLabel bulletEnem = new JLabel(bullet1);
-            enemyBullets.add(bulletEnem);
+
+        for (int i = 0; i < 3; i++) {
+            Bullet bulletShip = new Bullet();
+            spaceBullets.add(bulletShip);
         }
+        ship.setBullets(spaceBullets);
+
+
+        for (int i = 0; i < aliens.size(); i++) {
+            Bullet bulletEnemy = new Bullet();
+            aliens.get(i).setBullet(bulletEnemy);
+        }
+
         ///set spaceShip
 //        ship.setBounds(WIDTH-(WIDTH/2), HEIGHT-75, 30, 30);
         /// Frame stuff
@@ -114,7 +108,7 @@ public class Game implements Runnable {
         frame.setBackground(Color.gray);
 
         frame.add(ship.getShip());
-        frame.add(bullet);
+//        frame.add(bullet);
         for (int i = 0; i < aliens.size(); i++) {
             frame.add(aliens.get(i).getAlienLabel());
         }
@@ -125,61 +119,13 @@ public class Game implements Runnable {
         frame.setLayout(null);
         frame.setVisible(true);
         frame.setLocationRelativeTo(null);
+        setAlienBullet();
+        startMoveAlienBullet();
 
-         setEnemyBullet = new Timer(Alien.getMoveAlienBulletTimer(),new AbstractAction("bullet begin enemy") {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                JLabel b = enemyBullets.get(enemyBulletNumber);
-
-                int randomNum = (int) (Math.random() * ((aliens.size())));
-
-                JLabel enemyBullet = aliens.get(randomNum).getAlienLabel();
-                b.setBounds(enemyBullet.getX(),enemyBullet.getY(),50,50);
-                enemyBulletNumber1 = enemyBulletNumber;
-                frame.add(b);
-                enemyBulletNumber = (enemyBulletNumber+1)%10;
-            }
-        });
-        setEnemyBullet.start();
-        moveEnemyBullet = new Timer(Alien.getMoveAlienBulletSpeed(),new AbstractAction("enemy bullet move") {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                JLabel b = enemyBullets.get(enemyBulletNumber1);
-
-                for (int i = 0; i <bullets.size() ; i++) {
-                    JLabel shipBullet = bullets.get(i);
-                    if(shipBullet.getY()>= b.getY()&& shipBullet.getY()<= b.getY()+20){
-                        if(shipBullet.getX()+10>= b.getX()&& shipBullet.getX()+20<= b.getX()+30){
-//                            frame.remove(shipBullet);
-                            shipBullet.setLocation(-50, -50);
-                            b.setLocation(-50, -50);
-                                break;
-                        }
-                    }
-                }
-                if(b.getY()>= ship.getShip().getY()-20&& b.getY()<= ship.getShip().getY()){
-                    if(b.getX()>= ship.getShip().getX()-27&& b.getX()<= ship.getShip().getX()+5){
-//                            frame.remove(shipBullet);
-//                        ship.setLocation(ship.getX()+10, ship.getY()+10);
-                        b.setLocation(-50,-50);
-                        lives--;
-                        livesLabel.setText("lives left : "+lives);
-                        if(lives == 0 ){
-                            endGame();
-                        }
-                    }
-                }
-
-                if(b.getY()<=530) {
-                    b.setLocation(b.getX(), b.getY() + 10);
-                }
-            }
-        });
-        moveEnemyBullet.start();
          setBullet = new Timer(ship.getMoveShipBulletTimer(),new AbstractAction("bullet begin") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                JLabel b = bullets.get(bulletNumber);
+                JLabel b = ship.getBullets().get(bulletNumber).getBulletLabel();
                 b.setBounds(ship.getShip().getX()-10,ship.getShip().getY()-15,50,50);
                 bulletNumber1 = bulletNumber;
                 frame.add(b);
@@ -190,7 +136,7 @@ public class Game implements Runnable {
          moveBullet = new Timer(ship.getMoveShipBulletSpeed(),new AbstractAction("bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                JLabel b = bullets.get(bulletNumber1);
+                JLabel b = ship.getBullets().get(bulletNumber1).getBulletLabel();
                 start++;
                 if(start <= 50){
                     return;
@@ -222,6 +168,130 @@ public class Game implements Runnable {
         frame.add(livesLabel);
         frame.add(scoreLabel);
     }
+
+    private void startMoveAlienBullet() {
+        moveAlienBullet = new Timer(Alien.getMoveAlienBulletSpeed(),new AbstractAction("enemy bullet move") {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+//                ii(aliens.size())
+                ArrayList<JLabel> bb= new ArrayList<>();
+//                bb = null;
+                bb.add(bulletNow1);
+
+                if(aliens.size()>=3){
+                    bb.add(bulletNow2);
+                    bb.add(bulletNow3);
+                } else if (aliens.size() == 2) {
+                    bb.add(bulletNow2);
+                }
+                System.out.println(bb.size());
+
+                for (int j = 0; j < bb.size(); j++) {
+                    JLabel b = bb.get(j);
+                    for (int i = 0; i <ship.getBullets().size(); i++) {
+                        JLabel shipBullet = ship.getBullets().get(i).getBulletLabel();
+                        if(shipBullet.getY()
+                                >= b.getY()
+                                && shipBullet.getY()
+                                <= b.getY()+20){
+                            if(shipBullet.getX()+10>= b.getX()&& shipBullet.getX()+20<= b.getX()+30){
+//                            frame.remove(shipBullet);
+                                shipBullet.setLocation(-50, -50);
+                                b.setLocation(-50, -50);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for (int j = 0; j < bb.size(); j++) {
+                    JLabel b = bb.get(j);
+                    if (b.getY() >= ship.getShip().getY() - 20 && b.getY() <= ship.getShip().getY()) {
+                        if (b.getX() >= ship.getShip().getX() - 27 && b.getX() <= ship.getShip().getX() + 5) {
+//                            frame.remove(shipBullet);
+//                        ship.setLocation(ship.getX()+10, ship.getY()+10);
+                            b.setLocation(-50, -50);
+                            lives--;
+                            livesLabel.setText("lives left : " + lives);
+                            if (lives == 0) {
+                                endGame();
+                            }
+                        }
+                    }
+                }
+                for (int j = 0; j < bb.size(); j++) {
+                    JLabel b = bb.get(j);
+                    if (b.getY() <= 530) {
+                        b.setLocation(b.getX(), b.getY() + 10);
+                    }
+                }
+//                bb.removeAll(bb);
+            }
+        });
+        moveAlienBullet.start();
+    }
+
+    private Timer moveAlien;
+    private Timer moveBullet;
+    private Timer setBullet;
+    private Timer moveAlienBullet;
+    private Timer setAlienBullet;
+    public void setAlienBullet() {
+        setAlienBullet = new Timer(Alien.getMoveAlienBulletTimer(),new AbstractAction("bullet begin enemy") {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                int randomNum = (int) (Math.random() * ((aliens.size())));
+                int randomNum2 = (int) (Math.random() * ((aliens.size())));
+                int randomNum3 = (int) (Math.random() * ((aliens.size())));
+                if(aliens.size() >= 3){
+                    while(randomNum == randomNum3 || randomNum2 == randomNum3 || randomNum2 == randomNum){
+                         randomNum = (int) (Math.random() * ((aliens.size())));
+                         randomNum2 = (int) (Math.random() * ((aliens.size())));
+                         randomNum3 = (int) (Math.random() * ((aliens.size())));
+                    }
+                    JLabel enemyPos = aliens.get(randomNum).getAlienLabel();
+                     bulletNow1 = aliens.get(randomNum).getBullet().getBulletLabel();
+                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(bulletNow1);
+
+                    JLabel enemyPos2 = aliens.get(randomNum2).getAlienLabel();
+                    bulletNow2 = aliens.get(randomNum2).getBullet().getBulletLabel();
+                    bulletNow2.setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
+                    frame.add(bulletNow2);
+
+                    JLabel enemyPos3 = aliens.get(randomNum3).getAlienLabel();
+                    bulletNow3 = aliens.get(randomNum3).getBullet().getBulletLabel();
+                    bulletNow3.setBounds(enemyPos3.getX(),enemyPos3.getY(),50,50);
+                    frame.add(bulletNow3);
+
+                } else if (aliens.size() == 2) {
+                    JLabel enemyPos = aliens.get(0).getAlienLabel();
+                    bulletNow1 = aliens.get(0).getBullet().getBulletLabel();
+                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(bulletNow1);
+
+                    JLabel enemyPos2 = aliens.get(1).getAlienLabel();
+                    bulletNow2 = aliens.get(1).getBullet().getBulletLabel();
+                    bulletNow2.setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
+                    frame.add(bulletNow2);
+
+                }else if (aliens.size() == 1){
+                    JLabel enemyPos = aliens.get(0).getAlienLabel();
+                    bulletNow1 = aliens.get(0).getBullet().getBulletLabel();
+                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(bulletNow1);
+
+                }
+            }
+        });
+        setAlienBullet.start();
+    }
+    private JLabel bulletNow1 = new JLabel();
+    private JLabel bulletNow2 = new JLabel();
+    private JLabel bulletNow3 = new JLabel();
+//    int bulletPerAttack = 3;
+//    int [] randomAlienBullets = new int[bulletPerAttack];
+
     private void setScore(){
         int enemiesLeft = aliens.size();
         int newScore =  20 * (50-enemiesLeft);
@@ -236,8 +306,8 @@ public class Game implements Runnable {
           moveBullet.stop();
           setBullet.stop();
           moveAlien.stop();
-          moveEnemyBullet.stop();
-          setEnemyBullet.stop();
+          moveAlienBullet.stop();
+         setAlienBullet.stop();
           gameThread = null;
           new Frame(score);
           frame.dispose();

@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class SpaceShip {
 
@@ -28,6 +29,16 @@ public class SpaceShip {
     private boolean isLeft;
     private boolean isUp;
     private boolean isDown;
+    private ArrayList<Bullet> bullets = new ArrayList<>();
+
+    public ArrayList<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public void setBullets(ArrayList<Bullet> bullets) {
+        this.bullets = bullets;
+    }
+
     public int getMovement() {
         return movement;
     }

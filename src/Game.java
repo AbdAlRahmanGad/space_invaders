@@ -30,6 +30,7 @@ public class Game implements Runnable {
     private ArrayList<Alien> aliens = new ArrayList<>();
     private SpaceShip ship = new SpaceShip(HEIGHT,WIDTH);
     private  ArrayList<Bullet> spaceBullets = new ArrayList<>();
+    private  ArrayList<Bullet> alienBullets = new ArrayList<>();
     private Audios audios ;
     Game(int myBulletSpeed , int enemyBulletSpeed, int screenMode,int bulletMode) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         audios = new Audios();
@@ -78,12 +79,10 @@ public class Game implements Runnable {
 //        }
         ship.setBullets(spaceBullets);
 
-
-        for (int i = 0; i < aliens.size(); i++) {
+        for (int i = 0; i < 3; i++) {
             Bullet bulletEnemy = new Bullet();
-            aliens.get(i).setBullet(bulletEnemy);
+            alienBullets.add(bulletEnemy);
         }
-
         ///set spaceShip
 //        ship.setBounds(WIDTH-(WIDTH/2), HEIGHT-75, 30, 30);
         /// Frame stuff
@@ -135,7 +134,6 @@ public class Game implements Runnable {
         });
         moveAlien.start();
     }
-
     private void startMoveShipBullet() {
         moveBullet = new Timer(ship.getMoveShipBulletSpeed(),new AbstractAction("bullet move") {
             @Override
@@ -188,16 +186,14 @@ public class Game implements Runnable {
         moveAlienBullet = new Timer(Alien.getMoveAlienBulletSpeed(),new AbstractAction("enemy bullet move") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                ArrayList<JLabel> bb= new ArrayList<>();
-                bb.add(bulletNow1);
+                int size = 1;
                 if(aliens.size()>=3){
-                    bb.add(bulletNow2);
-                    bb.add(bulletNow3);
+                    size = 3;
                 } else if (aliens.size() == 2) {
-                    bb.add(bulletNow2);
+                    size = 2;
                 }
-                for (int j = 0; j < bb.size(); j++) {
-                    JLabel b = bb.get(j);
+                for (int j = 0; j < size; j++) {
+                    JLabel b = alienBullets.get(j).getBulletLabel();
                     for (int i = 0; i <ship.getBullets().size(); i++) {
                         JLabel shipBullet = ship.getBullets().get(i).getBulletLabel();
                         if(shipBullet.getY()
@@ -205,7 +201,6 @@ public class Game implements Runnable {
                                 && shipBullet.getY()
                                 <= b.getY()+20){
                             if(shipBullet.getX()+10>= b.getX()&& shipBullet.getX()+20<= b.getX()+30){
-//                            frame.remove(shipBullet);
                                 shipBullet.setLocation(-50, -50);
                                 b.setLocation(-50, -50);
                                 break;
@@ -214,12 +209,10 @@ public class Game implements Runnable {
                     }
                 }
 
-                for (int j = 0; j < bb.size(); j++) {
-                    JLabel b = bb.get(j);
+                for (int j = 0; j < size; j++) {
+                    JLabel b = alienBullets.get(j).getBulletLabel();
                     if (b.getY() >= ship.getShip().getY() - 20 && b.getY() <= ship.getShip().getY()) {
                         if (b.getX() >= ship.getShip().getX() - 27 && b.getX() <= ship.getShip().getX() + 5) {
-//                            frame.remove(shipBullet);
-//                        ship.setLocation(ship.getX()+10, ship.getY()+10);
                             b.setLocation(-50, -50);
                             lives--;
                             livesLabel.setText("lives left : " + lives);
@@ -229,13 +222,23 @@ public class Game implements Runnable {
                         }
                     }
                 }
-                for (int j = 0; j < bb.size(); j++) {
-                    JLabel b = bb.get(j);
+                for (int j = 0; j < size; j++) {
+                    JLabel b = alienBullets.get(j).getBulletLabel();
                     if (b.getY() <= 530) {
                         b.setLocation(b.getX(), b.getY() + 10);
                     }
                 }
-//                bb.removeAll(bb);
+                if(size == 2){
+                    JLabel b = alienBullets.get(2).getBulletLabel();
+                    if (b.getY() <= 530) {
+                        b.setLocation(b.getX(), b.getY() + 10);
+                    }
+                } else if (size == 1 ) {
+                    JLabel b = alienBullets.get(1).getBulletLabel();
+                    if (b.getY() <= 530) {
+                        b.setLocation(b.getX(), b.getY() + 10);
+                    }
+                }
             }
         });
         moveAlienBullet.start();
@@ -260,48 +263,36 @@ public class Game implements Runnable {
                          randomNum3 = (int) (Math.random() * ((aliens.size())));
                     }
                     JLabel enemyPos = aliens.get(randomNum).getAlienLabel();
-                     bulletNow1 = aliens.get(randomNum).getBullet().getBulletLabel();
-                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
-                    frame.add(bulletNow1);
+                    alienBullets.get(0).getBulletLabel().setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(alienBullets.get(0).getBulletLabel());
 
                     JLabel enemyPos2 = aliens.get(randomNum2).getAlienLabel();
-                    bulletNow2 = aliens.get(randomNum2).getBullet().getBulletLabel();
-                    bulletNow2.setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
-                    frame.add(bulletNow2);
-
+                    alienBullets.get(1).getBulletLabel().setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
+                    frame.add(alienBullets.get(1).getBulletLabel());
+//
                     JLabel enemyPos3 = aliens.get(randomNum3).getAlienLabel();
-                    bulletNow3 = aliens.get(randomNum3).getBullet().getBulletLabel();
-                    bulletNow3.setBounds(enemyPos3.getX(),enemyPos3.getY(),50,50);
-                    frame.add(bulletNow3);
+                    alienBullets.get(2).getBulletLabel().setBounds(enemyPos3.getX(),enemyPos3.getY(),50,50);
+                    frame.add(alienBullets.get(2).getBulletLabel());
 
                 } else if (aliens.size() == 2) {
                     JLabel enemyPos = aliens.get(0).getAlienLabel();
-                    bulletNow1 = aliens.get(0).getBullet().getBulletLabel();
-                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
-                    frame.add(bulletNow1);
+                    alienBullets.get(0).getBulletLabel().setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(alienBullets.get(0).getBulletLabel());
 
                     JLabel enemyPos2 = aliens.get(1).getAlienLabel();
-                    bulletNow2 = aliens.get(1).getBullet().getBulletLabel();
-                    bulletNow2.setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
-                    frame.add(bulletNow2);
+                    alienBullets.get(1).getBulletLabel().setBounds(enemyPos2.getX(),enemyPos2.getY(),50,50);
+                    frame.add(alienBullets.get(1).getBulletLabel());
 
                 }else if (aliens.size() == 1){
                     JLabel enemyPos = aliens.get(0).getAlienLabel();
-                    bulletNow1 = aliens.get(0).getBullet().getBulletLabel();
-                    bulletNow1.setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
-                    frame.add(bulletNow1);
+                    alienBullets.get(0).getBulletLabel().setBounds(enemyPos.getX(),enemyPos.getY(),50,50);
+                    frame.add(alienBullets.get(0).getBulletLabel());
 
                 }
             }
         });
         setAlienBullet.start();
     }
-    private JLabel bulletNow1 = new JLabel();
-    private JLabel bulletNow2 = new JLabel();
-    private JLabel bulletNow3 = new JLabel();
-//    int bulletPerAttack = 3;
-//    int [] randomAlienBullets = new int[bulletPerAttack];
-
     private void setScore(){
         int enemiesLeft = aliens.size();
         int newScore =  20 * (50-enemiesLeft);

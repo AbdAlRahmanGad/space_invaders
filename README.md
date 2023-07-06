@@ -13,8 +13,8 @@ The game has a few customizations
 
 
 
-https://github.com/AbdAlRahmanGad/space_invaders/assets/89566409/1356cf2d-9db6-4ba8-97ea-17adf29f19af
 
+https://github.com/AbdAlRahmanGad/space_invaders/assets/89566409/1d88144c-a140-4c18-ba9f-1155e0394793
 
 The actual gameplay is pretty simple , the bullets are being shot automatically you just have to move around. 
 
